@@ -1,1 +1,1 @@
-# kursach_2
+# kursach
