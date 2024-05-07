@@ -1,12 +1,7 @@
 import os
-from dotenv import load_dotenv
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 import pickle
-
-load_dotenv()
-client_id = os.getenv('CLIENT_ID')
-client_secret = os.getenv('CLIENT_SECRET')
 
 
 def Authorize(file):
@@ -24,7 +19,7 @@ def Authorize(file):
                 'https://www.googleapis.com/auth/userinfo.profile',
                 'https://www.googleapis.com/auth/youtube',
                 'https://www.googleapis.com/auth/youtube.force-ssl',
-                'https://www.googleapis.com/auth/youtube.readonly',
+                'https://www.googleapis.com/auth/youtube.readonly'
             })
             flow.run_local_server(
                 host='localhost',
