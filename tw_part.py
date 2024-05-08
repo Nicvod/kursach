@@ -28,7 +28,7 @@ class TwBot(commands.Bot):
 
     async def update_func(self):
         while True:
-            host_info = self.communicator.get_hosts_info("TW_CNG")
+            host_info = self.communicator.get_hosts_info("TW")
             if host_info is None:
                 break
             if host_info.status:
@@ -41,7 +41,6 @@ class TwBot(commands.Bot):
             message = self.communicator.get_message("TW")
             if message is None:
                 break
-            print(f'Message for TW: {message.author}, {message.text}')
             tw_channel = self.tw_from_yt[message.host_info]
             author = message.author
             text = message.text

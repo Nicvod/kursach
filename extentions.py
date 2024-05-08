@@ -19,37 +19,42 @@ class HostsUnion:
 
 class ThreadCommunication:
     def __init__(self):
-        self.queues = {
+        self.queues_messages = {
             "YT": Queue(),
-            "TW": Queue(),
-            "TW_CNG": Queue(),
-            "YT_CNG": Queue()
+            "TW": Queue()
         }
-        self.locks = {
+        self.locks_messages = {
             "YT": threading.Lock(),
-            "TW": threading.Lock(),
-            "TW_CNG": threading.Lock(),
-            "YT_CNG": threading.Lock()
+            "TW": threading.Lock()
+        }
+
+        self.queues_hosts = {
+            "YT": Queue(),
+            "TW": Queue()
+        }
+        self.locks_hosts = {
+            "YT": threading.Lock(),
+            "TW": threading.Lock()
         }
 
     def add_message(self, thread_name: str, item: MyMessage) -> None:
-        with self.locks[thread_name]:
-            self.queues[thread_name].put(item)
+        with self.locks_messages[thread_name]:
+            self.queues_messages[thread_name].put(item)
 
     def get_message(self, thread_name: str) -> Union[None, MyMessage]:
-        with self.locks[thread_name]:
-            if not self.queues[thread_name].empty():
-                return self.queues[thread_name].get()
+        with self.locks_messages[thread_name]:
+            if not self.queues_messages[thread_name].empty():
+                return self.queues_messages[thread_name].get()
             else:
                 return None
 
     def add_hosts_info(self, thread_name: str, item: HostsUnion) -> None:
-        with self.locks[thread_name]:
-            self.queues[thread_name].put(item)
+        with self.locks_hosts[thread_name]:
+            self.queues_hosts[thread_name].put(item)
 
     def get_hosts_info(self, thread_name: str) -> Union[None, HostsUnion]:
-        with self.locks[thread_name]:
-            if not self.queues[thread_name].empty():
-                return self.queues[thread_name].get()
+        with self.locks_hosts[thread_name]:
+            if not self.queues_hosts[thread_name].empty():
+                return self.queues_hosts[thread_name].get()
             else:
                 return None

@@ -129,9 +129,9 @@ class MyTgBot:
                         self.bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                                    text="Пересылка сообщений начата", reply_markup=MakeStartKeyBoard())
                         self.cur_livestreams.add(call.from_user.id)
-                        self.communicator.add_hosts_info(thread_name="TW_CNG",
+                        self.communicator.add_hosts_info(thread_name="TW",
                                                          item=HostsUnion(tw_info=tw_acc, yt_info=yt_acc, status=True))
-                        self.communicator.add_hosts_info(thread_name="YT_CNG",
+                        self.communicator.add_hosts_info(thread_name="YT",
                                                          item=HostsUnion(tw_info=tw_acc, yt_info=yt_acc, status=True))
             elif call.data == "stop_livestream":
                 usr_id = self.GetUserId(call.from_user.id)
@@ -146,9 +146,9 @@ class MyTgBot:
                     self.bot.edit_message_text(chat_id=call.message.chat.id, message_id=call.message.message_id,
                                           text="Пересылка сообщений прекращена", reply_markup=MakeStartKeyBoard())
                     self.cur_livestreams.discard(call.from_user.id)
-                    self.communicator.add_hosts_info(thread_name="TW_CNG",
+                    self.communicator.add_hosts_info(thread_name="TW",
                                                      item=HostsUnion(tw_info=tw_acc, yt_info=yt_acc, status=False))
-                    self.communicator.add_hosts_info(thread_name="YT_CNG",
+                    self.communicator.add_hosts_info(thread_name="YT",
                                                      item=HostsUnion(tw_info=tw_acc, yt_info=yt_acc, status=False))
             elif call.data == "help":
                 usr_id = self.GetUserId(call.from_user.id)
