@@ -5,6 +5,23 @@ from googleapiclient.errors import HttpError
 from yt_auth import Authorize
 from extentions import MyMessage, HostsUnion, ThreadCommunication
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler('YT.log')
+file_handler.setLevel(logging.INFO)
+
+console_handler = logging.StreamHandler()
+console_handler.setLevel(logging.INFO)
+
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+file_handler.setFormatter(formatter)
+console_handler.setFormatter(formatter)
+
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
 
 
 class YTMessage:
@@ -46,6 +63,8 @@ class YTBot:
         chat_id = self.GetLiveChatId(live_stream_id)
         author = message.author
         text = message.text
+        logger.info(f"Before sending for youtube: {author} send message from {message.host_name}: {text},\
+                                    chat_id: {chat_id}")
         reply = self.youtube.liveChatMessages().insert(
             part="snippet",
             body={
@@ -59,6 +78,8 @@ class YTBot:
             }
         )
         reply.execute()
+        logger.info(f"After sending for youtube: {author} send message from {message.host_name}: {text},\
+                                    chat_id: {chat_id}")
 
     def GetMessages(self, live_stream_id, chat_id) -> List['YTMessage']:
         messages = list()
@@ -78,26 +99,32 @@ class YTBot:
             if len(response['items']) == 0:
                 break
             for item in response['items']:
-                text = item['snippet']['displayMessage']
-                author = item['authorDetails']['displayName']
-                author_id = item['authorDetails']['channelId']
-                published_at = item['snippet']['publishedAt']
-                if published_at <= last_published:
+                try:
+                    text = item['snippet']['displayMessage']
+                    author = item['authorDetails']['displayName']
+                    author_id = item['authorDetails']['channelId']
+                    published_at = item['snippet']['publishedAt']
+                    if published_at <= last_published:
+                        continue
+                    if author_id == self.bot_usr_id:
+                        continue
+                    last_published = published_at
+                    messages.append(YTMessage(author=author, text=text))
+                except Exception as e:
+                    logger.info(f"Ошибка: {e}")
                     continue
-                if author_id == self.bot_usr_id:
-                    continue
-                messages.append(YTMessage(author=author, text=text))
             if 'nextPageToken' in response:
                 next_page_token = response['nextPageToken']
-                next_page_token = None
-                self.page_tokens[live_stream_id] = next_page_token
+                # self.page_tokens[live_stream_id] = next_page_token
             else:
                 break
             time.sleep(2)
+        self.last_published[live_stream_id] = last_published
         return messages
 
     def ReadMessages(self):
         for tw_acc in self.yt_from_tw:
+            logger.info(f"Read for tw: {tw_acc}")
             live_stream_id = self.yt_from_tw[tw_acc]
             chat_id = self.chat_id[live_stream_id]
             messages = self.GetMessages(live_stream_id=live_stream_id, chat_id=chat_id)

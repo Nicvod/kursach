@@ -1,6 +1,3 @@
-# from aiologger.loggers.json import JsonLogger
-import time
-
 from db_part import DbClass
 from tg_part import MyTgBot
 from tw_part import TwBot
