@@ -6,6 +6,7 @@ from yt_auth import Authorize
 from extentions import MyMessage, HostsUnion, ThreadCommunication
 from typing import List
 import logging
+import datetime
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -72,7 +73,7 @@ class YTBot:
                     "liveChatId": chat_id,
                     "type": "textMessageEvent",
                     "textMessageDetails": {
-                        "messageText": f"{author} send message from {message.host_name}: {text}",
+                        "messageText": f"{author} sent message from {message.host_name}: {text}",
                     }
                 }
             }
@@ -87,13 +88,18 @@ class YTBot:
         next_page_token = self.page_tokens[live_stream_id]
 
         while True:
-            request = self.youtube.liveChatMessages().list(
-                liveChatId=chat_id,
-                part="snippet,authorDetails",
-                maxResults=100,
-                pageToken=next_page_token
-            )
-            response = request.execute()
+            try:
+                request = self.youtube.liveChatMessages().list(
+                    liveChatId=chat_id,
+                    part="snippet,authorDetails",
+                    maxResults=100,
+                    pageToken=next_page_token
+                )
+                response = request.execute()
+            except HttpError as e:
+                logger.info(f"Request Error: {e}")
+                time.sleep(1.5)
+                continue
             if response is None or "items" not in response:
                 break
             if len(response['items']) == 0:
@@ -118,7 +124,6 @@ class YTBot:
                 # self.page_tokens[live_stream_id] = next_page_token
             else:
                 break
-            time.sleep(2)
         self.last_published[live_stream_id] = last_published
         return messages
 
@@ -140,10 +145,13 @@ class YTBot:
                 host_info = self.communicator.get_hosts_info("YT")
                 if host_info is None:
                     break
+                logger.info(f"YT channel update tw_info: {host_info.tw_info}, yt_info: {host_info.yt_info}, status:\
+                                                                                {host_info.status}")
                 if host_info.status:
                     self.yt_from_tw[host_info.tw_info] = host_info.yt_info
                     self.chat_id[host_info.yt_info] = self.GetLiveChatId(host_info.yt_info)
-                    self.last_published[host_info.yt_info] = "2000-01-01T00:00:00.0Z"
+                    # "2000-01-01T00:00:00.0Z"
+                    self.last_published[host_info.yt_info] = datetime.datetime.now().isoformat()
                     self.page_tokens[host_info.yt_info] = None
                 else:
                     self.yt_from_tw.pop(host_info.tw_info, None)

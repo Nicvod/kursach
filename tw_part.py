@@ -26,7 +26,6 @@ class TwBot(commands.Bot):
         self.communicator = communicator
         self.loop.create_task(self.endless_loop())
         self.tw_from_yt = dict()
-        self.last_send = 0
         self.fl = False
 
     async def event_ready(self):
@@ -46,10 +45,9 @@ class TwBot(commands.Bot):
         if self.fl:
             return
         self.fl = True
-        logger.info("New endless_loop")
         while True:
             await self.update_func()
-            await asyncio.sleep(10)
+            await asyncio.sleep(1)
 
     async def update_func(self):
         while True:
@@ -77,6 +75,6 @@ class TwBot(commands.Bot):
             author = message.author
             text = message.text
             self.last_send = time.time()
-            await channel.send(f"{author} send message from {message.host_name}: {text}")
+            await channel.send(f"{author} sent message from {message.host_name}: {text}")
             logger.info(f"Sent message for tw, host: {message.host_name}, author: {author}, text: {text} ")
 
