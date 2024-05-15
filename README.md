@@ -1,7 +1,7 @@
 # Coursework
 ## Зависимости
 
-[telebot](https://pypi.org/project/pyTelegramBotAPI/), [twitchio](https://twitchio.dev/en/latest/installing.html), google_api: [1](https://github.com/googleapis/google-api-python-client), [2](https://github.com/googleapis/google-api-python-client), [3](https://pypi.org/project/google-auth/)
+[telebot](https://pypi.org/project/pyTelegramBotAPI/), [twitchio](https://twitchio.dev/en/latest/installing.html), google_api: [1](https://github.com/googleapis/google-api-python-client), [2](https://pypi.org/project/google-auth-oauthlib/), [3](https://pypi.org/project/google-auth/)
 
 ### Подготовка
 
